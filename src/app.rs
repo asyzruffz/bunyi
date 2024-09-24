@@ -5,7 +5,9 @@ pub struct App;
 impl App {
     pub fn run(title: &str) -> eframe::Result {
         let options = eframe::NativeOptions {
-            viewport: egui::ViewportBuilder::default().with_inner_size([800.0, 600.0]),
+            viewport: egui::ViewportBuilder::default()
+                .with_inner_size([1024.0, 768.0])
+                .with_position([448.0, 156.0 - 50.0]),
             ..Default::default()
         };
 
