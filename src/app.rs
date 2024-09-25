@@ -1,34 +1,39 @@
-use eframe::egui;
+use anyhow::Result;
+use eframe::{egui, App};
 
-pub struct App;
+use crate::errors::to_anyhow;
+use crate::widgets::main_panel::MainPanel;
+use crate::widgets::view::View;
 
-impl App {
-    pub fn run(title: &str) -> eframe::Result {
-        let options = eframe::NativeOptions {
-            viewport: egui::ViewportBuilder::default()
-                .with_inner_size([1024.0, 768.0])
-                .with_position([448.0, 156.0 - 50.0]),
-            ..Default::default()
-        };
+pub fn run_app(title: &str) -> Result<()> {
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([1024.0, 768.0])
+            .with_position([448.0, 156.0 - 50.0]),
+        ..Default::default()
+    };
 
-        // Our application state:
-        let mut name = "Arthur".to_owned();
-        let mut age = 42;
+    eframe::run_native(title, options, Box::new(|cc| Ok(Box::new(BunyiApp::new(cc)))))
+        .map_err(to_anyhow)
+}
 
-        eframe::run_simple_native(title, options, move |ctx, _frame| {
-            egui::CentralPanel::default().show(ctx, |ui| {
-                ui.heading("My egui Application");
-                ui.horizontal(|ui| {
-                    let name_label = ui.label("Your name: ");
-                    ui.text_edit_singleline(&mut name)
-                        .labelled_by(name_label.id);
-                });
-                ui.add(egui::Slider::new(&mut age, 0..=120).text("age"));
-                if ui.button("Increment").clicked() {
-                    age += 1;
-                }
-                ui.label(format!("Hello '{name}', age {age}"));
-            });
-        })
+#[derive(Default)]
+struct BunyiApp {
+    main_panel: MainPanel,
+}
+
+impl BunyiApp {
+    fn new(_cc: &eframe::CreationContext<'_>) -> Self {
+        // Customize egui here with cc.egui_ctx.set_fonts and cc.egui_ctx.set_visuals.
+        // Restore app state using cc.storage (requires the "persistence" feature).
+        // Use the cc.gl (a glow::Context) to create graphics shaders and buffers that you can use
+        // for e.g. egui::PaintCallback.
+        Self::default()
+    }
+}
+
+impl App for BunyiApp {
+   fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.main_panel.show(ctx);
     }
 }
